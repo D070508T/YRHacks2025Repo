@@ -250,7 +250,31 @@ Hit [ENTER] for default (5)
 
     df = generate_signals(df)
     df = df.iloc[:length]
-    plot_stock_trends(df, ticker, period, intervals.get(period), low, high, moving_average=ma)
+
+    x = []
+    open = df['Open'].astype(float).values
+    close = df['Close'].astype(float).values
+    high = df['High'].astype(float).values
+    low = df['Low'].astype(float).values
+    ema = df['EMA'].astype(float).values
+
+    for i in range(len(df)):
+        x.append(i)
+
+    dpg.create_context()
+
+    with dpg.window(label="Tutorial", height=800, width=800, no_close=True, no_move=True, no_resize=True):
+        with dpg.plot(label="Line Series", height=800, width=800):
+            dpg.add_plot_axis(dpg.mvXAxis, label="x")
+            dpg.add_plot_axis(dpg.mvYAxis, label="y", tag="y_axis")
+            dpg.add_line_series(x, ema, label="Exponential Moving Average", parent="y_axis")
+            dpg.add_candle_series(dates=x, opens=open, closes=close, lows=low, highs=high, label="CANDLE", parent='y_axis')
+
+    dpg.create_viewport(title='Custom Title', width=820, height=600)
+    dpg.setup_dearpygui()
+    dpg.show_viewport()
+    dpg.start_dearpygui()
+    dpg.destroy_context()
 
 while True:
     user_input = input("""Enter valid ticker

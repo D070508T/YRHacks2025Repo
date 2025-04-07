@@ -4,24 +4,6 @@ import pandas as pd
 import dearpygui.dearpygui as dpg
 
 
-def printDict(dictionary):
-    for key, value in dictionary.items():
-        if type(dictionary[key]) == dict:
-            print(key + " information:")
-            printDict(dictionary[key])
-        elif type(dictionary[key]) == list:
-            if len(dictionary[key]) == 0:
-                print(key + ": EMPTY")
-            else:
-                print('_' * 80)
-                print(key + ":")
-                for item in dictionary[key]:
-                    printDict(item)
-                    print('_' * 80)
-        else:
-            print(key, ":", value)
-
-
 frequencies = {
     '2m': '2min',
     '15m': '15min',
@@ -34,21 +16,6 @@ frequencies = {
     '3mo': '3M'
 }
 
-# “1m”, “2m”, “5m”, “15m”, “30m”, “60m”, “90m”, “1h”, “1d”, “5d”, “1wk”, “1mo”, “3mo”
-intervals = {
-    '1d': '2m',
-    '5d': '15m',
-    '1mo': '1h',
-    '3mo': '1d',
-    '6mo': '1d',
-    '1y': '1d',
-    '2y': '5d',
-    '5y': '1wk',
-    '10y': '1mo',
-    'ytd': '3mo',
-    'max': '3mo'
-}
-
 pd.set_option('display.max_rows', None)  # Show all rows
 pd.set_option('display.max_columns', None)  # Show all columns
 pd.set_option('display.width', None)  # Allow the output to be as wide as needed
@@ -58,9 +25,7 @@ pd.set_option('display.max_colwidth', None)  # To prevent truncation of column c
 # Download stock data
 def get_stock_data(ticker, period, interval):
     df = yf.download(ticker, period=period, interval=interval, auto_adjust=True, progress=False)
-
     df.index = pd.date_range(start=df.index[0], periods=len(df), freq=frequencies.get(interval))
-
     return df
 
 
@@ -250,26 +215,5 @@ Enter a valid timeframe
 
 while True:
     user_input = input("""Enter valid ticker
-You will return to menu automatically
-To launch chart, enter a space and 'CHART' after the ticker
-If you launch a chart, simply close the chart to return to menu
 >>> """).upper()
-    if user_input.endswith("CHART"):
-        graph(user_input.replace(" CHART", ""))
-    else:
-        company = yf.Ticker(user_input)
-        stock_info = company.info
-        printDict(stock_info)
-        print("-" * 80)
-        print(company.recommendations)
-        print("-" * 80)
-
-        print("ARTICLES:")
-        for article in company.news:
-            content = article.get("content", {})  # Get content dictionary safely
-
-            if content == {}:
-                print("ERROR: NO ARTICLE DATA")
-            else:
-                printDict(content)
-            print("-" * 80)
+    graph(user_input.replace(" CHART", ""))
