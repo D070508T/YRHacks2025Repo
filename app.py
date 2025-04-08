@@ -162,7 +162,46 @@ Enter a valid timeframe
         increasing_fillcolor='#2ECC71',
         decreasing_fillcolor='#E74C3C'
     )])
+
+    # Add clean buy/sell signal visualization
+    if 'Final_Buy' in df.columns:
+        buy_signals = df[df['Final_Buy']]
+        y_coords = buy_signals['Close'].to_numpy(dtype=np.float64).flatten()
+        if not buy_signals.empty:
+            fig.add_trace(go.Scatter(
+                x=buy_signals.index,
+                y=y_coords,
+                mode='markers+text',
+                marker=dict(
+                    color='#00FF00',  # Bright green
+                    size=14,
+                    symbol='triangle-up',
+                    line=dict(width=1, color='black')
+                ),
+                name='BUY',
+                text='BUY',
+                textposition='top center'
+            ))
     
+    if 'Final_Sell' in df.columns:
+        sell_signals = df[df['Final_Sell']]
+        y_coords = sell_signals['Close'].to_numpy(dtype=np.float64).flatten()
+        if not sell_signals.empty:
+            fig.add_trace(go.Scatter(
+                x=sell_signals.index,
+                y=y_coords,
+                mode='markers+text',
+                marker=dict(
+                    color='#FF0000',  # Bright red
+                    size=14,
+                    symbol='triangle-down',
+                    line=dict(width=1, color='black')
+                ),
+                name='SELL',
+                text='SELL',
+                textposition='bottom center'
+            ))
+
     # Dynamic axis scaling
     price_range = df['High'].max() - df['Low'].min()
     padding = price_range * 0.05
