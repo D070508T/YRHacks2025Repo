@@ -140,6 +140,7 @@ Enter a valid timeframe
     highs = df['High'].to_numpy(dtype=np.float64).flatten()
     lows = df['Low'].to_numpy(dtype=np.float64).flatten()
     closes = df['Close'].to_numpy(dtype=np.float64).flatten()
+    ema = df['EMA'].to_numpy(dtype=np.float64).flatten()
     
     print("\nTuple data validation:")
     print(f"First date: {dates[0]}")
@@ -198,6 +199,15 @@ Enter a valid timeframe
         )
     )
 
+    reference_line = go.Scatter(x=dates,
+                            y=ema,
+                            mode="lines",
+                            line=go.scatter.Line(color="gray"),
+                            showlegend=True,
+                            name='Exponential Moving Average')
+
+    fig.add_trace(reference_line)
+    
     if period in ['1d', '5d', '1mo', '3mo']:
         fig.update_xaxes(showticklabels=False) # hide all the xticks
     else:
