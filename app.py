@@ -1,3 +1,4 @@
+import plotly as plt
 import plotly.graph_objects as go
 import pandas as pd
 import yfinance as yf
@@ -273,6 +274,7 @@ Enter a valid timeframe
     )
     
     output_file = "enhanced_candlestick.html"
+    print(plt.offline.plot(fig, include_plotlyjs=False, output_type='div'))
     fig.write_html(output_file, auto_open=True)
 
 while True:
