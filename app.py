@@ -1,6 +1,5 @@
 import plotly.graph_objects as go
 import pandas as pd
-from datetime import datetime
 import yfinance as yf
 import pandas as pd
 import numpy as np
@@ -69,14 +68,14 @@ def rsi_signals(df, low=36, high=68, lookback_period=5):
     return df
 
 
-def detect_ma_crossovers(df, ticker, lookback_period=5, moving_average='EMA'):
+def detect_ma_crossovers(df, ticker, lookback_period=5):
     # Create the 'Previous_Close' column
     df['Previous_Close'] = df['Close'].shift(1).fillna(0)
 
-    df['Cross_Above'] = ((df['Previous_Close'] < df[moving_average]) &
-                         (df[('Close', ticker)] >= df[(moving_average, '')]))
-    df['Cross_Below'] = ((df['Previous_Close'] > df[moving_average]) &
-                         (df[('Close', ticker)] <= df[(moving_average, '')]))
+    df['Cross_Above'] = ((df['Previous_Close'] < df['EMA']) &
+                         (df[('Close', ticker)] >= df[('EMA', '')]))
+    df['Cross_Below'] = ((df['Previous_Close'] > df['EMA']) &
+                         (df[('Close', ticker)] <= df[('EMA', '')]))
 
     # Check if a crossover happened in the last `lookback_period` days
     df['Recent_Cross_Above'] = df['Cross_Above'].rolling(lookback_period).max().astype(bool)
@@ -131,7 +130,7 @@ Enter a valid timeframe
     df = compute_moving_averages(df, moving_average_strength)
     df = relative_strength_index(df, RSI_strength)
     df = rsi_signals(df, RSI_low_threshold, RSI_high_threshold, lookback_period)
-    df = detect_ma_crossovers(df, company_ticker, lookback_period, 'EMA')
+    df = detect_ma_crossovers(df, company_ticker, lookback_period)
     df = generate_signals(df)
     df = df.iloc[:length]
 
