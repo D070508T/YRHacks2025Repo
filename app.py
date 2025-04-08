@@ -3,6 +3,7 @@ import pandas as pd
 from datetime import datetime
 import yfinance as yf
 import pandas as pd
+import numpy as np
 
 pd.set_option('display.max_rows', None)  # None means no limit
 pd.set_option('display.max_columns', None)  # None means no limit
@@ -139,12 +140,11 @@ Enter a valid timeframe
     low_prices = df['Low'].astype(float).values
     ema = df['EMA'].astype(float).values
 
-    # Convert data to tuples as requested
-    dates = tuple(df.index.to_pydatetime())
-    opens = tuple(float(x) for x in df['Open'].values)
-    highs = tuple(float(x) for x in df['High'].values)
-    lows = tuple(float(x) for x in df['Low'].values)
-    closes = tuple(float(x) for x in df['Close'].values)
+    dates = df.index.to_numpy(dtype='datetime64[s]')
+    opens = df['Open'].to_numpy(dtype=np.float64).flatten()
+    highs = df['High'].to_numpy(dtype=np.float64).flatten()
+    lows = df['Low'].to_numpy(dtype=np.float64).flatten()
+    closes = df['Close'].to_numpy(dtype=np.float64).flatten()
     
     print("\nTuple data validation:")
     print(f"First date: {dates[0]}")
