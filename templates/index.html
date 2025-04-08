@@ -1,0 +1,175 @@
+{% extends "layout.html" %}
+
+
+{% block title %}Stock Analysis{% endblock %}
+
+
+{% block main %}
+<div class="row">
+    <div class="col-md-8 mx-auto">
+        <div class="card shadow">
+            <div class="card-header bg-primary text-white">
+                <h4 class="mb-0">
+                    <i class="bi bi-search"></i> Stock Lookup
+                </h4>
+            </div>
+            <div class="card-body">
+                <form action="/" method="post">
+                    <div class="mb-3">
+                        <label for="ticker" class="form-label">Stock Ticker Symbol</label>
+                        <input type="text" class="form-control" id="ticker" name="ticker"
+                               placeholder="e.g. AAPL, MSFT, TSLA" required>
+                    </div>
+                    <div class="row g-2 mb-3">
+                        <div class="col-md-6">
+                            <label for="period" class="form-label">Time Period</label>
+                            <select class="form-select" id="period" name="period">
+                                <option value="1d">1 Day</option>
+                                <option value="5d">5 Days</option>
+                                <option value="1mo" selected>1 Month</option>
+                                <option value="3mo">3 Months</option>
+                                <option value="6mo">6 Months</option>
+                                <option value="1y">1 Year</option>
+                                <option value="2y">2 Years</option>
+                                <option value="5y">5 Years</option>
+                                <option value="10y">10 Years</option>
+                                <option value="ytd">Year to Date</option>
+                                <option value="max">Max</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="analysis" class="form-label">Analysis Type</label>
+                            <select class="form-select" id="analysis" name="analysis">
+                                <option value="basic">Basic Info</option>
+                                <option value="rsi">RSI Analysis</option>
+                                <option value="ma">Moving Averages</option>
+                                <option value="full">Full Analysis</option>
+                            </select>
+                        </div>
+                    </div>
+
+
+                    <div class="row g-2 mb-3">
+                        <div class="col-md-4">
+                            <label for="ma_window" class="form-label">MA Window</label>
+                            <input type="number" class="form-control" id="ma_window" name="ma_window" value="25" min="5" max="100">
+                        </div>
+                        <div class="col-md-4">
+                            <label for="rsi_strength" class="form-label">RSI Strength</label>
+                            <input type="number" class="form-control" id="rsi_strength" name="rsi_strength" value="7" min="1" max="20">
+                        </div>
+                        <div class="col-md-4">
+                            <label for="lookback" class="form-label">Lookback Period</label>
+                            <input type="number" class="form-control" id="lookback" name="lookback" value="5" min="1" max="20">
+                        </div>
+                    </div>
+
+
+                    <div class="row g-2 mb-3">
+                        <div class="col-md-6">
+                            <label for="rsi_low" class="form-label">RSI Low Threshold</label>
+                            <input type="number" class="form-control" id="rsi_low" name="rsi_low" value="36" min="10" max="50">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="rsi_high" class="form-label">RSI High Threshold</label>
+                            <input type="number" class="form-control" id="rsi_high" name="rsi_high" value="68" min="50" max="90">
+                        </div>
+                    </div>
+
+
+                    <div class="row g-2 mb-3">
+                        <div class="col-md-6">
+                            <label for="ma_type" class="form-label">MA Type</label>
+                            <select class="form-select" id="ma_type" name="ma_type">
+                                <option value="EMA">Exponential (EMA)</option>
+                                <option value="SMA">Simple (SMA)</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="signal_priority" class="form-label">Signal Priority</label>
+                            <select class="form-select" id="signal_priority" name="signal_priority">
+                                <option value="RSI">RSI First</option>
+                                <option value="MA">MA First</option>
+                            </select>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-graph-up"></i> Analyze
+                    </button>
+                </form>
+            </div>
+        </div>
+
+
+        {% if results %}
+        <div class="card mt-4 shadow">
+            <div class="card-header bg-success text-white">
+                <h4 class="mb-0">Analysis Results</h4>
+            </div>
+            <div class="card-body">
+                <!-- Company Info -->
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <h5>{{ results.company }} ({{ results.ticker }})</h5>
+                        <p>Sector: {{ results.sector }}</p>
+                        <p>Current Price: ${{ results.current_price }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <p>Market Cap: ${{ results.market_cap }}</p>
+                        <p>52 Week High: ${{ results.high_52wk }}</p>
+                        <p>52 Week Low: ${{ results.low_52wk }}</p>
+                    </div>
+                </div>
+
+
+                <!-- Technical Indicators -->
+                <div class="row mb-4">
+                    <div class="col-md-4">
+                        <div class="card">
+                            <div class="card-body">
+                                <h6 class="card-title">RSI</h6>
+                                <p class="display-6">{{ results.last_rsi|round(2) }}</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card">
+                            <div class="card-body">
+                                <h6 class="card-title">SMA</h6>
+                                <p class="display-6">{{ results.last_sma|round(2) }}</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card">
+                            <div class="card-body">
+                                <h6 class="card-title">EMA</h6>
+                                <p class="display-6">{{ results.last_ema|round(2) }}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+                <!-- Stock Chart -->
+                <div class="mb-4">
+                    <h5>Price and Indicators</h5>
+                    <div class="chart-container">
+                        {{ results.stock_chart|safe }}
+                    </div>
+                </div>
+
+
+                <!-- RSI Chart -->
+                <div class="mb-4">
+                    <h5>RSI Analysis</h5>
+                    <div class="chart-container">
+                        {{ results.rsi_chart|safe }}
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
