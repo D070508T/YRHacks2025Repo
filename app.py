@@ -147,6 +147,7 @@ Enter a valid timeframe
     print(f"First open/high/low/close: {opens[0]}, {highs[0]}, {lows[0]}, {closes[0]}")
     
     close_text = ["Close: $" + f"{closes[i]:.2f}" for i in range(len(closes))]
+    ema_text = ["EMA: $" + f"{ema[i]:.2f}" for i in range(len(ema))]
     
     # Create candlestick chart with verified data
     fig = go.Figure(data=[go.Candlestick(
@@ -170,7 +171,7 @@ Enter a valid timeframe
     padding = price_range * 0.05
     
     fig.update_layout(
-        title='AAPL Stock: Last 30 Days',
+        title=ticker+' Stock: Last '+period,
         yaxis_title='Price ($)',
         xaxis_title='Date',
         plot_bgcolor='white',
@@ -204,14 +205,18 @@ Enter a valid timeframe
                             mode="lines",
                             line=go.scatter.Line(color="gray"),
                             showlegend=True,
-                            name='Exponential Moving Average')
+                            name='Exponential Moving Average',
+                            customdata=df["EMA"],
+                            text=ema_text,
+                            hoverinfo="text"
+                            )
+                            
 
     fig.add_trace(reference_line)
+    fig.update_layout(hovermode="x")
     
     if period in ['1d', '5d', '1mo', '3mo']:
         fig.update_xaxes(showticklabels=False) # hide all the xticks
-    else:
-        fig.update_layout(hovermode="x")
 
     # Add clean buy/sell signal visualization
     if 'Final_Buy' in df.columns:
