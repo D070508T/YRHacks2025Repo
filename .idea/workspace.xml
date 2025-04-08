@@ -1,7 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
   <component name="ChangeListManager">
-    <list default="true" id="0392b0bd-18db-4fe4-b8df-d04c86d9598a" name="Changes" comment="FIRST">
+    <list default="true" id="0392b0bd-18db-4fe4-b8df-d04c86d9598a" name="Changes" comment="BARE MINIMUM FOR NAMAN">
+      <change afterPath="$PROJECT_DIR$/project.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/with_dearpygui.py" beforeDir="false" afterPath="$PROJECT_DIR$/with_dearpygui.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -40,12 +45,15 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;master&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "Python.bare_min.executor": "Run",
+    "Python.project.executor": "Run",
+    "Python.with_dearpygui.executor": "Run",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "git-widget-placeholder": "master"
   }
-}</component>
+}]]></component>
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
@@ -70,11 +78,20 @@
       <option name="project" value="LOCAL" />
       <updated>1744064727766</updated>
     </task>
-    <option name="localTasksCounter" value="2" />
+    <task id="LOCAL-00002" summary="BARE MINIMUM FOR NAMAN">
+      <option name="closed" value="true" />
+      <created>1744065206653</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1744065206653</updated>
+    </task>
+    <option name="localTasksCounter" value="3" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="FIRST" />
-    <option name="LAST_COMMIT_MESSAGE" value="FIRST" />
+    <MESSAGE value="BARE MINIMUM FOR NAMAN" />
+    <option name="LAST_COMMIT_MESSAGE" value="BARE MINIMUM FOR NAMAN" />
   </component>
 </project>

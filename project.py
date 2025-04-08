@@ -1,4 +1,3 @@
-import datetime
 import yfinance as yf
 from matplotlib import pyplot as plt
 import pandas as pd
@@ -6,7 +5,6 @@ import dearpygui.dearpygui as dpg
 
 pd.set_option('display.max_rows', None)  # None means no limit
 pd.set_option('display.max_columns', None)  # None means no limit
-
 
 frequencies = {
     '2m': '2min',
@@ -16,8 +14,8 @@ frequencies = {
     '1d': '1D',
     '5d': '5D',
     '1wk': '1W',
-    '1mo': '1M',
-    '3mo': '3M'
+    '1mo': '1ME',
+    '3mo': '3ME'
 }
 
 pd.set_option('display.max_rows', None)  # Show all rows
@@ -72,8 +70,10 @@ def detect_ma_crossovers(df, ticker, lookback_period=5, moving_average='EMA'):
     # Create the 'Previous_Close' column
     df['Previous_Close'] = df['Close'].shift(1).fillna(0)
 
-    df['Cross_Above'] = (df['Previous_Close'] < df[moving_average]) & (df[('Close', ticker)] >= df[(moving_average, '')])
-    df['Cross_Below'] = (df['Previous_Close'] > df[moving_average]) & (df[('Close', ticker)] <= df[(moving_average, '')])
+    df['Cross_Above'] = ((df['Previous_Close'] < df[moving_average]) &
+                         (df[('Close', ticker)] >= df[(moving_average, '')]))
+    df['Cross_Below'] = ((df['Previous_Close'] > df[moving_average]) &
+                         (df[('Close', ticker)] <= df[(moving_average, '')]))
 
     # Check if a crossover happened in the last `lookback_period` days
     df['Recent_Cross_Above'] = df['Cross_Above'].rolling(lookback_period).max().astype(bool)
@@ -117,10 +117,12 @@ To display closing chart, hit [ENTER]
         y = 'Price'
 
         buy_signals = df[df['Final_Buy']]
-        plt.scatter(buy_signals.index, buy_signals['Close'], color='green', label='Buy Signal', marker='o', s=50)
+        plt.scatter(buy_signals.index, buy_signals['Close'], color='green',
+                    label='Buy Signal', marker='o', s=50)
 
         sell_signals = df[df['Final_Sell']]
-        plt.scatter(sell_signals.index, sell_signals['Close'], color='red', label='Sell Signal', marker='o', s=50)
+        plt.scatter(sell_signals.index, sell_signals['Close'], color='red',
+                    label='Sell Signal', marker='o', s=50)
 
     plt.title(title)
     plt.xlabel('Timestamp')
@@ -148,75 +150,36 @@ Enter a valid timeframe
 >>> """)
 
     x = []
-    open_prices = []
-    close_prices = []
-    high_prices = []
-    low_prices = []
-    ema = []
 
     if period == '1d':
         df = get_stock_data(ticker, '1d', '2m')
     elif period == '5d':
         df = get_stock_data(ticker, '5d', '5m')
     elif period == '1mo':
-        df = get_stock_data(ticker, '1mo', '90m')
+        df = get_stock_data(ticker, '1mo', '30m')
     elif period == '3mo':
-        df = get_stock_data(ticker, '3mo', '90m')
+        df = get_stock_data(ticker, '3mo', '60m')
     elif period == '1y':
         df = get_stock_data(ticker, '1y', '1d')
     elif period == '2y':
-        df = get_stock_data(ticker, '2y', '5d')
+        df = get_stock_data(ticker, '2y', '1d')
     elif period == '5y':
-        df = get_stock_data(ticker, '5y', '1mo')
-    elif period == '10y':
-        df = get_stock_data(ticker, '10y', '3mo')
-
-    # if period.endswith('d'):
-    #     number = int(period[:-1])
-    #     df = get_stock_data(ticker, period, '2m')
-    #     length = len(df)
-    #     currentCandle = length - 1
-    #     for i in range(length-1, 0, -1):
-    #         if i % number != 0:
-    #             df.iloc[currentCandle, 1] = max(df.iloc[i, 1], df.iloc[currentCandle, 1])
-    #             df.iloc[currentCandle, 2] = min(df.iloc[i, 2], df.iloc[currentCandle, 2])
-    #             print(df.iloc[currentCandle, 1])
-    #             print(df.iloc[currentCandle, 2])
-    #             df = df.drop(df.index[i])
-    #         else:
-    #             currentCandle = i
-    # elif period.endswith('w'):
-    #     number = int(period[:-1])
-    #     period = str((number*7)) + 'd'
-    #     df = get_stock_data(ticker, period, '15m')
-    #     length = len(df)
-    #     for i in range(len(df)-1, 0, -1):
-    #         if i % number != 0:
-    #             df = df.drop(df.index[i])
-    # elif period.endswith('mo'):
-    #     number = int(period[:-2])
-    #     df = get_stock_data(ticker, period, '1h')
-    #     length = len(df)
-    #     for i in range(len(df)-1, 0, -1):
-    #         if i % number != 0:
-    #             df = df.drop(df.index[i])
-    # else:
-    #     number = int(period[:-1])
-    #     df = get_stock_data(ticker, period, '1d')
-    #     length = len(df)
-    #     for i in range(len(df)-1, 0, -2):
-    #         df = df.drop(df.index[i])
-    #
-    #     for i in range(len(df)-1, 0, -1):
-    #         if i % number != 0:
-    #             df = df.drop(df.index[i])
+        df = get_stock_data(ticker, '5y', '1wk')
+    else:  # assume 10y
+        df = get_stock_data(ticker, '10y', '1wk')
 
     length = len(df)
 
-    df = compute_moving_averages(df, 25)
-    df = relative_strength_index(df, 7)
-    df = rsi_signals(df, 36, 68, 5)
-    df = detect_ma_crossovers(df, company_ticker, 5, 'EMA')
+    moving_average_strength = 25
+    RSI_strength = 7
+    RSI_low_threshold = 36
+    RSI_high_threshold = 68
+    lookback_period = 5
+
+    df = compute_moving_averages(df, moving_average_strength)
+    df = relative_strength_index(df, RSI_strength)
+    df = rsi_signals(df, RSI_low_threshold, RSI_high_threshold, lookback_period)
+    df = detect_ma_crossovers(df, company_ticker, lookback_period, 'EMA')
     df = generate_signals(df)
     df = df.iloc[:length]
 
@@ -231,25 +194,25 @@ Enter a valid timeframe
 
     dpg.create_context()
 
-    with dpg.window(label="Tutorial", height=800, width=800, no_close=True, no_move=True, no_resize=True):
-        with dpg.plot(label="Line Series", height=800, width=800):
-            x_axis = dpg.add_plot_axis(dpg.mvXAxis, label="x")
+    with dpg.window(label="Tutorial", height=800, width=1400, no_close=True, no_move=True, no_resize=True):
+        with dpg.plot(label="Line Series", height=800, width=1400):
+            dpg.add_plot_axis(dpg.mvXAxis, label="x")
             y_axis = dpg.add_plot_axis(dpg.mvYAxis, label="y", tag="y_axis")
 
             dpg.add_line_series(x, ema, label="Exponential Moving Average", parent="y_axis")
-            dpg.add_candle_series(dates=x, opens=open_prices, closes=close_prices, lows=low_prices, highs=high_prices, label="CANDLE", parent='y_axis')
+            dpg.add_candle_series(dates=x,
+                                  opens=open_prices, closes=close_prices,
+                                  lows=low_prices, highs=high_prices,
+                                  label="CANDLE", parent='y_axis')
 
-            min_y = min(low_prices) - 20
-            max_y = max(high_prices) + 2
+            dpg.set_axis_limits(y_axis, min(low_prices) - 10, max(high_prices) + 10)
 
-            # Set the Y-axis limits to fit the data
-            dpg.set_axis_limits(y_axis, min_y, max_y)
-
-    dpg.create_viewport(title='Custom Title', width=820, height=600)
+    dpg.create_viewport(title='Custom Title', width=1400, height=800, resizable=False)
     dpg.setup_dearpygui()
     dpg.show_viewport()
     dpg.start_dearpygui()
     dpg.destroy_context()
+
 
 while True:
     user_input = input("""Enter valid ticker
