@@ -30,7 +30,8 @@ pd.set_option('display.max_colwidth', None)  # To prevent truncation of column c
 def get_stock_data(ticker, period, interval):
     df = yf.download(ticker, period=period, interval=interval, auto_adjust=True, progress=False)
     print(df)
-    df.index = pd.date_range(start=df.index[0], periods=len(df), freq=frequencies.get(interval))
+    if period in ['1d', '5d', '1mo', '3mo']:
+        df.index = pd.date_range(start=df.index[0], periods=len(df), freq=frequencies.get(interval))
     return df
 
 
@@ -134,12 +135,6 @@ Enter a valid timeframe
     df = generate_signals(df)
     df = df.iloc[:length]
 
-    open_prices = df['Open'].astype(float).values
-    close_prices = df['Close'].astype(float).values
-    high_prices = df['High'].astype(float).values
-    low_prices = df['Low'].astype(float).values
-    ema = df['EMA'].astype(float).values
-
     dates = df.index.to_numpy(dtype='datetime64[s]')
     opens = df['Open'].to_numpy(dtype=np.float64).flatten()
     highs = df['High'].to_numpy(dtype=np.float64).flatten()
@@ -149,6 +144,8 @@ Enter a valid timeframe
     print("\nTuple data validation:")
     print(f"First date: {dates[0]}")
     print(f"First open/high/low/close: {opens[0]}, {highs[0]}, {lows[0]}, {closes[0]}")
+    
+    close_text = ["Close: $" + f"{closes[i]:.2f}" for i in range(len(closes))]
     
     # Create candlestick chart with verified data
     fig = go.Figure(data=[go.Candlestick(
@@ -160,47 +157,12 @@ Enter a valid timeframe
         increasing_line_color='#2ECC71',  # Green
         decreasing_line_color='#E74C3C',  # Red
         increasing_fillcolor='#2ECC71',
-        decreasing_fillcolor='#E74C3C'
+        decreasing_fillcolor='#E74C3C',
+        name="Up Trend",
+        customdata=df["Close"],
+        text=close_text,
+        hoverinfo="text"
     )])
-
-    # Add clean buy/sell signal visualization
-    if 'Final_Buy' in df.columns:
-        buy_signals = df[df['Final_Buy']]
-        y_coords = buy_signals['Close'].to_numpy(dtype=np.float64).flatten()
-        if not buy_signals.empty:
-            fig.add_trace(go.Scatter(
-                x=buy_signals.index,
-                y=y_coords,
-                mode='markers+text',
-                marker=dict(
-                    color='#00FF00',  # Bright green
-                    size=14,
-                    symbol='triangle-up',
-                    line=dict(width=1, color='black')
-                ),
-                name='BUY',
-                text='BUY',
-                textposition='top center'
-            ))
-    
-    if 'Final_Sell' in df.columns:
-        sell_signals = df[df['Final_Sell']]
-        y_coords = sell_signals['Close'].to_numpy(dtype=np.float64).flatten()
-        if not sell_signals.empty:
-            fig.add_trace(go.Scatter(
-                x=sell_signals.index,
-                y=y_coords,
-                mode='markers+text',
-                marker=dict(
-                    color='#FF0000',  # Bright red
-                    size=14,
-                    symbol='triangle-down',
-                    line=dict(width=1, color='black')
-                ),
-                name='SELL',
-                text='SELL',
-                textposition='bottom center'
-            ))
 
     # Dynamic axis scaling
     price_range = df['High'].max() - df['Low'].min()
@@ -213,7 +175,87 @@ Enter a valid timeframe
         plot_bgcolor='white',
         paper_bgcolor='white',
         yaxis_range=[df['Low'].min()-padding, df['High'].max()+padding],
-        xaxis_rangeslider_visible=True
+        xaxis_rangeslider_visible=True,
+
+        # Main x-axis (x1) configuration
+        xaxis=dict(
+            domain=[0, 1],  # Takes full width
+            showspikes=True,
+            title='Date'
+        ),
+        
+        # Range slider configuration (x2)
+        xaxis2=dict(
+            domain=[0, 1],  # Position below main chart
+            rangeslider=dict(visible=True),
+            matches='x1',
+            showticklabels=False,
+            showgrid=False,
+            showline=False,
+            overlaying='x1',  # Makes it share the same space
+            layer='above traces',    # Puts it behind main chart
+            range=[None, None],  # Maintains auto-ranging
+        )
+    )
+
+    if period in ['1d', '5d', '1mo', '3mo']:
+        fig.update_xaxes(showticklabels=False) # hide all the xticks
+    else:
+        fig.update_layout(hovermode="x")
+
+    # Add clean buy/sell signal visualization
+    if 'Final_Buy' in df.columns:
+        buy_signals = df[df['Final_Buy']]
+        y_coords = buy_signals['Close'].to_numpy(dtype=np.float64).flatten()
+        if not buy_signals.empty:
+            fig.add_trace(go.Scatter(
+                x=buy_signals.index,
+                y=y_coords,
+                mode='markers',
+                marker=dict(
+                    color='#00FF00',  # Bright green
+                    size=10,
+                    symbol='triangle-up',
+                    line=dict(width=1, color='black')
+                ),
+                name='BUY',
+                textposition='top center',
+                xaxis='x1',
+                yaxis='y1',
+                customdata=df["Close"],
+                text='BUY',
+                hoverinfo="text"
+            ))
+    
+    if 'Final_Sell' in df.columns:
+        sell_signals = df[df['Final_Sell']]
+        y_coords = sell_signals['Close'].to_numpy(dtype=np.float64).flatten()
+        if not sell_signals.empty:
+            fig.add_trace(go.Scatter(
+                x=sell_signals.index,
+                y=y_coords,
+                mode='markers',
+                marker=dict(
+                    color='#FF0000',  # Bright red
+                    size=10,
+                    symbol='triangle-down',
+                    line=dict(width=1, color='black')
+                ),
+                name='SELL',
+                textposition='bottom center',
+                xaxis='x1',
+                yaxis='y1',
+                customdata=df["Close"],
+                text='SELL',
+                hoverinfo="text"
+            ))
+    
+    fig.update_layout(
+        xaxis2=dict(
+            showticklabels=False,
+            showgrid=False,
+            showline=False
+        )
     )
     
     output_file = "enhanced_candlestick.html"

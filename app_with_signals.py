@@ -73,9 +73,9 @@ def detect_ma_crossovers(df, ticker, lookback_period=5, moving_average='EMA'):
     df['Previous_Close'] = df['Close'].shift(1).fillna(0)
 
     df['Cross_Above'] = ((df['Previous_Close'] < df[moving_average]) &
-                         (df[('Close', ticker)] >= df[moving_average]))
+                         (df[('Close', ticker)] >= df[(moving_average, '')]))
     df['Cross_Below'] = ((df['Previous_Close'] > df[moving_average]) &
-                         (df[('Close', ticker)] <= df[moving_average]))
+                         (df[('Close', ticker)] <= df[(moving_average, '')]))
 
     # Check if a crossover happened in the last `lookback_period` days
     df['Recent_Cross_Above'] = df['Cross_Above'].rolling(lookback_period).max().astype(bool)
@@ -180,7 +180,8 @@ Enter a valid timeframe
                 ),
                 name='BUY',
                 text='BUY',
-                textposition='top center'
+                textposition='top center',
+                xaxis='x1'
             ))
     
     if 'Final_Sell' in df.columns:
@@ -199,7 +200,8 @@ Enter a valid timeframe
                 ),
                 name='SELL',
                 text='SELL',
-                textposition='bottom center'
+                textposition='bottom center',
+                xaxis='x1'
             ))
 
     # Dynamic axis scaling
@@ -207,13 +209,27 @@ Enter a valid timeframe
     padding = price_range * 0.05
     
     fig.update_layout(
-        title=f'{ticker} Stock with Trading Signals',
+        title='AAPL Stock: Last 30 Days',
         yaxis_title='Price ($)',
         xaxis_title='Date',
         plot_bgcolor='white',
         paper_bgcolor='white',
         yaxis_range=[df['Low'].min()-padding, df['High'].max()+padding],
-        xaxis_rangeslider_visible=True
+        xaxis_rangeslider_visible=True,
+
+        # Main x-axis (x1) configuration
+        xaxis=dict(
+            domain=[0, 1],  # Takes full width
+            showspikes=True,
+            title='Date'
+        ),
+        
+        # Range slider configuration (x2)
+        xaxis2=dict(
+            domain=[0, 1],  # Position below main chart
+            rangeslider=dict(visible=True),
+            matches='x1'  # Sync with main axis
+        )
     )
     
     output_file = "enhanced_candlestick.html"
