@@ -4,10 +4,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="0392b0bd-18db-4fe4-b8df-d04c86d9598a" name="Changes" comment="BARE MINIMUM FOR NAMAN">
-      <change afterPath="$PROJECT_DIR$/project.py" afterDir="false" />
+    <list default="true" id="0392b0bd-18db-4fe4-b8df-d04c86d9598a" name="Changes" comment="Final_Project">
+      <change afterPath="$PROJECT_DIR$/learning_plotly.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/plotly_learning.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/with_dearpygui.py" beforeDir="false" afterPath="$PROJECT_DIR$/with_dearpygui.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -47,7 +47,9 @@
   </component>
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
+    "DefaultHtmlFileTemplate": "HTML File",
     "Python.bare_min.executor": "Run",
+    "Python.learning_plotly.executor": "Run",
     "Python.project.executor": "Run",
     "Python.with_dearpygui.executor": "Run",
     "RunOnceActivity.ShowReadmeOnStart": "true",
@@ -86,12 +88,21 @@
       <option name="project" value="LOCAL" />
       <updated>1744065206653</updated>
     </task>
-    <option name="localTasksCounter" value="3" />
+    <task id="LOCAL-00003" summary="Final_Project">
+      <option name="closed" value="true" />
+      <created>1744072082381</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1744072082381</updated>
+    </task>
+    <option name="localTasksCounter" value="4" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="FIRST" />
     <MESSAGE value="BARE MINIMUM FOR NAMAN" />
-    <option name="LAST_COMMIT_MESSAGE" value="BARE MINIMUM FOR NAMAN" />
+    <MESSAGE value="Final_Project" />
+    <option name="LAST_COMMIT_MESSAGE" value="Final_Project" />
   </component>
 </project>
